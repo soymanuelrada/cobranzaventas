@@ -1,0 +1,12 @@
+{
+  "name": "CobranzaVentas",
+  "short_name": "CobranzaVentas",
+  "description": "Control de ventas, abonos y saldos pendientes",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f7f6",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "icons": []
+}
