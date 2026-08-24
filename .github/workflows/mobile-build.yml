@@ -1,0 +1,54 @@
+name: Build CobranzaVentas Mobile
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install dependencies
+        run: npm install
+      - name: Generate Android project
+        run: npx cap add android && npx cap sync android
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CobranzaVentas-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Generate iOS project
+        run: npx cap add ios && npx cap sync ios
+      - name: Build iOS simulator app
+        run: xcodebuild -workspace ios/App/App.xcworkspace -scheme App -sdk iphonesimulator -configuration Debug -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+      - name: Package iOS simulator app
+        run: cd build/ios/Build/Products/Debug-iphonesimulator && zip -r "$GITHUB_WORKSPACE/CobranzaVentas-iOS-Simulator.zip" App.app
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CobranzaVentas-iOS-Simulator
+          path: CobranzaVentas-iOS-Simulator.zip
